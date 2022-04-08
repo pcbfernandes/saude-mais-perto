@@ -1,0 +1,18 @@
+﻿<AuthorizeView>
+	<Authorized>
+		<a href="">
+			<span class="oi oi-person" aria-hidden="true"></span>
+			<span>@context.User.Identity?.Name</span>
+		</a>
+		<a href="Seguranca/LogOut">
+			<span class="oi oi-account-logout" aria-hidden="true"></span>
+			<span>Sair</span>
+		</a>
+	</Authorized>
+	<NotAuthorized>
+		<a href="Seguranca/Login">
+			<span class="oi oi-account-login" aria-hidden="true"></span>
+			<span>Acessar</span>
+		</a>
+	</NotAuthorized>
+</AuthorizeView>

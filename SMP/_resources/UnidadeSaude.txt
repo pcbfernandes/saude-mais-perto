@@ -1,0 +1,10 @@
+[
+  {
+    "CNES": "0000000",
+    "Descricao": "UNIDADE PILOTO",
+	"CodigoIBGE": "5300108",
+    "ListaCepCobertura": [
+      "*"
+    ]
+  }
+]

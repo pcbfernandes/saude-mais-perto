@@ -1,0 +1,61 @@
+﻿@page "/relatorio"
+@inherits RelatorioBase
+@attribute [Authorize(Policy = SMP.Dominio.Seguranca.Policies.IsAdmin)]
+
+@using SMP.Shared.Component
+
+<h3>Relatório</h3>
+
+<div class="form-group">
+	<div class="form-inline">
+		<div class="col-auto">Exibir</div>
+		<div class="col-auto">
+			<TelerikDropDownList Data="@FiltroOpcoes"
+								 @bind-Value="@FiltroSelecionado"
+								 TextField="Key"
+								 ValueField="Value">
+				<DropDownListSettings>
+					<DropDownListPopupSettings Height="auto"></DropDownListPopupSettings>
+				</DropDownListSettings>
+			</TelerikDropDownList>
+		</div>
+	</div>
+</div>
+
+<TelerikListView Data=@(ListaPessoa.Where(p=> !FiltroSelecionado.HasValue
+				 || (p.ModelResultadoValidacaoPessoa?.EstaValido == null && FiltroSelecionado == 1)
+				 || (p.ModelResultadoValidacaoPessoa?.EstaValido == true && FiltroSelecionado == 2)
+				 || (p.ModelResultadoValidacaoPessoa?.EstaValido == false && FiltroSelecionado == 3)).ToList())>
+	<Template>
+		<div class="k-card k-card-vertical">
+			<div class="k-vbox k-flex-grow">
+				<div class="k-card-body">
+					<ResumoPessoaComponent ModelPessoa="@context" ExibirApenas="@ExibirApenas" ColBotstrap=4 ExibirSituacaoCadastral=true />
+				</div>
+
+			</div>
+			<div class="">
+				<div class="k-card-actions k-card-actions-vertical k-card-actions-start">
+					<div class="form-inlnine row">
+						<div class="col-md-auto">
+							<ListViewCommandButton Icon="pencil" OnClick="@Editar" Class="w-100">Editar</ListViewCommandButton>
+						</div>
+						<div class="col-md-auto">
+							<ListViewCommandButton Icon="eye" OnClick="@VisualizarXml" Class="w-100">Visualizar xml</ListViewCommandButton>
+						</div>
+						<div class="col-md-auto" id="divArquivo" title="@(context.ModelArquivo != null ? $"Tamanho: {context.ModelArquivo?.TamanhoFormatado}" : "Arquivo não enviado")">
+							<ListViewCommandButton OnClick="@VisualizarArquivo" Icon="download" Enabled="@(context.ModelArquivo?.IdArquivoDados != null)" Class="w-100">Baixar arquivo</ListViewCommandButton>
+							<TelerikTooltip TargetSelector="#divArquivo" Position="@TooltipPosition.Top" ShowOn="@TooltipShowEvent.Hover"></TelerikTooltip>
+						</div>
+						<div class="col-md-auto">
+							<ListViewCommandButton Icon="check-outline" OnClick="@Validar" Class="w-100">Simular Validação</ListViewCommandButton>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</Template>
+</TelerikListView>
+
+<PreviaXmlComponent ParametroCPF="@CpfSelecionado" @ref="TelaPreviaXml"></PreviaXmlComponent>
+<ValidarPessoa ParametroCPF="@CpfSelecionadoValidacao" @ref="TelaValidarPessoa"></ValidarPessoa>

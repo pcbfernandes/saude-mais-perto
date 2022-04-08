@@ -1,0 +1,50 @@
+﻿@page "/TipoCadastro"
+@inherits TipoCadastroBase
+
+<PageTitle>Saúde + Perto</PageTitle>
+
+<div class="text-center">
+	<h1>Acesso</h1>
+	<div class="form-inline">
+		<div class="col-md">
+			<div class="jumbotron">
+				<p class="lead">Informe o CPF para acessar o cadastramento.</p>
+				<p class="lead">Você será solicitado a enviar um arquivo que contenha o CPF posteriormente.</p>
+				<EditForm Model="@ModelAcesso" class="text-center" Context="cpfContext"
+						  OnValidSubmit="@HandleValidSubmit"
+						  OnInvalidSubmit="@HandleInvalidSubmit">
+					<DataAnnotationsValidator />
+					<CustomValidation @ref="CustomValidation" />
+					<TelerikValidationSummary Class="text-center" Context="cpfContext" />
+
+					<div class="text-center align-content-center d-inline-block">
+						<div class="form-inline align-items-end justify-content-center">
+							<div class="col-auto k-form-field text-center form-group mb-0">
+								<TelerikFloatingLabel Text="CPF:" Class="float-center">
+									<div class="k-form-field-wrap">
+										<TelerikMaskedTextBox @bind-Value="@ModelAcesso.CPF" MaskOnFocus=true Mask="000.000.000-00" IncludeLiterals=false></TelerikMaskedTextBox>
+									</div>
+								</TelerikFloatingLabel>
+							</div>
+
+							<div class="col-autotext-center ml-md-3">
+								<TelerikButton ButtonType="@ButtonType.Submit"
+											   Class="k-form-submit align-bottom"
+											   ThemeColor="@ThemeConstants.Button.ThemeColor.Primary">Acessar</TelerikButton>
+							</div>
+						</div>
+					</div>
+				</EditForm>
+			</div>
+		</div>
+		<div class="col-md">
+			<div class="jumbotron">
+				<p class="lead">Selecione um arquivo que contenha o CPF.</p>
+				<p class="lead">O cadastro será realizado para o CPF identificado no arquivo.</p>
+
+				<FileUpload></FileUpload>
+			</div>
+		</div>
+	</div>
+</div>
+

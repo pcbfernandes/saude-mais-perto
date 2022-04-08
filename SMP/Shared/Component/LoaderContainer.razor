@@ -1,0 +1,34 @@
+﻿<TelerikLoaderContainer Visible="@IsBusy" LoaderPosition="@LoaderPosition.Top">
+	<Template>
+		@if (IsOnTopScreen)
+		{
+			<div class="fixed-top align-content-center" style="margin-top: 30px;">
+				<div class="bg-light rounded p-2 float-center d-inline-block">
+					<div class="form-group">
+						<TelerikLoader Type="@LoaderType.ConvergingSpinner"></TelerikLoader>
+					</div>
+					<div class="text-primary">
+						<span>@Message</span>
+					</div>
+				</div>
+			</div>
+		}
+		else
+		{
+			<div class="bg-light rounded p-2 float-center d-inline-block">
+				<div class="form-group">
+					<TelerikLoader Type="@LoaderType.ConvergingSpinner"></TelerikLoader>
+				</div>
+				<div class="text-primary">
+					<span>@Message</span>
+				</div>
+			</div>
+		}
+	</Template>
+</TelerikLoaderContainer>
+
+@code {
+	[Parameter] public bool IsBusy { get; set; }
+	[Parameter] public bool IsOnTopScreen { get; set; } = false;
+	[Parameter] public string Message { get; set; } = "Carregando, por favor aguarde...";
+}

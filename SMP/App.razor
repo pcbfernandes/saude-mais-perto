@@ -1,0 +1,76 @@
+﻿@inject SMP.Services.TokenProvider TokenProvider
+@inject NavigationManager _navManager
+
+@code {
+
+    [Parameter]
+    public SMP.Services.InitialApplicationState InitialState { get; set; }
+
+
+    [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        TokenProvider.XsrfToken = InitialState.XsrfToken;
+        TokenProvider.Cookie = InitialState.Cookie;
+
+        return base.OnInitializedAsync();
+    }
+}
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(Program).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <div class="jumbotron">
+                        <div class="form-group">
+                            <h1>Você não possui permissão para acessar essa página.</h1>
+                            @{
+                                var user = AuthStat?.GetAwaiter().GetResult()?.User;
+                                if (user?.Identity.IsAuthenticated != true)
+                                {
+                                    string urlLogin = "Seguranca/Login";
+                                    string targetUrl = _navManager.ToBaseRelativePath(_navManager.Uri);
+                                    targetUrl = Uri.EscapeDataString(targetUrl);
+                                    if (!string.IsNullOrWhiteSpace(targetUrl))
+                                    {
+                                        urlLogin += $"?returnUrl={targetUrl}";
+                                    }
+
+                                    <div class="text-left">
+                                        <a class="btn btn-outline-primary" href="@urlLogin">
+                                            <span class="oi oi-account-login" aria-hidden="true"></span>
+                                            <span>Acessar</span>
+                                        </a>
+                                    </div>
+                                }
+                            }
+
+                        </div>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p>Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+
+@*<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+*@

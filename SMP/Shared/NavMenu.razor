@@ -1,0 +1,66 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+
+
+	<div class="container">
+
+		<a class="navbar-brand p-0" href="#">
+			<img src="favicon.ico" alt="Saúde + Perto" height="45">
+		</a>
+
+		<button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+	</div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+	<nav class="flex-column">
+		<AuthorizeView>
+			<NotAuthorized>
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+						<span class="oi oi-star" aria-hidden="true"></span> Início
+					</NavLink>
+				</div>
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" href="/TipoCadastro" Match="NavLinkMatch.All">
+						<span class="oi oi-home" aria-hidden="true"></span> Cadastro
+					</NavLink>
+				</div>
+			</NotAuthorized>
+			<Authorized>
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+						<span class="oi oi-star" aria-hidden="true"></span> Início
+					</NavLink>
+				</div>
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" href="/TipoCadastro" Match="NavLinkMatch.All">
+						<span class="oi oi-home" aria-hidden="true"></span> Cadastro
+					</NavLink>
+				</div>
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" href="/Relatorio" Match="NavLinkMatch.All">
+						<span class="oi oi-list" aria-hidden="true"></span> Relatório
+					</NavLink>
+				</div>
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" href="/Indicadores" Match="NavLinkMatch.All">
+						<span class="oi oi-pie-chart" aria-hidden="true"></span> Indicadores
+					</NavLink>
+				</div>
+			</Authorized>
+		</AuthorizeView>
+	</nav>
+</div>
+
+@code {
+	private bool collapseNavMenu = true;
+
+	private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+	private void ToggleNavMenu()
+	{
+		collapseNavMenu = !collapseNavMenu;
+	}
+}

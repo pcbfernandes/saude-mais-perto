@@ -1,0 +1,28 @@
+﻿@inherits ResumoPessoaComponentBase
+
+<LoaderContainer IsBusy="@IsBusy"></LoaderContainer>
+
+@if (ExibirSituacaoCadastral)
+{
+	string css = "info";
+
+	if (ModelPessoa.ModelResultadoValidacaoPessoa?.EstaValido != null)
+	{
+		css = ModelPessoa.ModelResultadoValidacaoPessoa.EstaValido == true ? "success" : "danger";
+	}
+
+	<div class="form-group">
+		<div class="text-left">
+			<div class="badge badge-@css">@(ModelPessoa.ModelResultadoValidacaoPessoa?.ResultadoValidacao ?? "Ainda não foi validado")</div>
+		</div>
+	</div>
+}
+
+<div class="col-md-12 form-inline clear-fix">
+	@foreach (var item in Resumo)
+	{
+		<div class="form-group col-md-@ColBotstrap clear-fix">
+			<div class="">@(item.Key) <b>@(item.Value)</b></div>
+		</div>
+	}
+</div>

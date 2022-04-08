@@ -1,0 +1,35 @@
+﻿@inherits PreviaXmlComponentBase
+
+<TelerikWindow Width="800px" Height="600px" Visible="@IsVisible" VisibleChanged="@VisibleChangedHandler" Modal="true">
+	<WindowTitle>
+		<strong>Visualização do XML</strong>
+	</WindowTitle>
+	<WindowActions>
+		<WindowAction Title="Maximizar" Name="Maximize" />
+		<WindowAction Title="Fechar" Name="Close" />
+	</WindowActions>
+	<WindowContent>
+		@if (IsBusy)
+		{
+			<div class="d-block text-center">
+				<TelerikLoader Class="loader-indicator" Type="@LoaderType.ConvergingSpinner" Size="@(ThemeConstants.Loader.Size.Large)"></TelerikLoader>
+			</div>
+		}
+		else
+		{
+			<div class="overflow-auto">
+				<span style="white-space: pre;">@PreviaXml</span>
+			</div>
+
+			<div class="d-block text-center">
+				<button class="btn btn-outline-primary " @onclick="() => Fechar()">Fechar</button>
+			</div>
+		}
+	</WindowContent>
+</TelerikWindow>
+
+<style type="text/css">
+	.demo-window {
+		z-index: 44444;
+	}
+</style>

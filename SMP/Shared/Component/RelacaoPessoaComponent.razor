@@ -1,0 +1,44 @@
+﻿@inherits RelacaoPessoaComponentBase
+
+
+
+@if (!string.IsNullOrWhiteSpace(CpfResponsavel))
+{
+	@if (ListaRelacionamentoPessoa?.Count() > 1)
+	{
+		<div class="form-group container">
+			<br /><br /><h4>Membros da Família</h4>
+
+			<table class="table">
+				<tbody>
+					@foreach (var item in ListaRelacionamentoPessoa)
+					{
+						<tr>
+							<td>
+								<div>
+									@if (!string.IsNullOrWhiteSpace(item.NomePessoa))
+									{
+										<div>
+											@item.NomePessoa
+										</div>
+									}
+								</div>
+								<div class="text-muted">
+									<i>
+										<span>CPF: @item.Cpf</span>
+
+										@if (item.Cpf == ParametroCpf)
+										{
+											<span> (Este cadastro)</span>
+										}
+									</i>
+								</div>
+							</td>
+							<td>@item.Relacao</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+}

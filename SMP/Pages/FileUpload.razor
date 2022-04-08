@@ -1,0 +1,108 @@
+﻿@*@page "/file-upload"*@
+@inherits FileUploadBase
+
+@*<h3>Upload Files</h3>*@
+
+
+<style>
+	.disabledDiv {
+		pointer-events: none;
+		opacity: 0.4;
+	}
+
+	.custom-file-input ~ .custom-file-label::after {
+		content: "Procurar...";
+	}
+
+	.custom-file-label ~ .custom-file-label::after {
+		padding: 0px;
+		margin: 0px;
+	}
+</style>
+
+<div class="col-auto d-inline-block text-center">
+	<TelerikFileSelect OnSelect=@HandleFiles OnRemove=@HandleRemoveFiles
+					   Multiple=false Enabled="@(!isLoading)"
+					   AllowedExtensions="@(new List<string>() { ".pdf", ".jpg", ".png", ".jpeg"})">
+	</TelerikFileSelect>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(LogInformativoUpload.Key))
+{
+	<div class="form-inline form-group">
+		<span class="col-auto align-self-start">
+			@if (LogInformativoUpload.Value == null)
+			{
+				<TelerikLoader Class="loader-indicator" Type="@LoaderType.ConvergingSpinner" Size="@(ThemeConstants.Loader.Size.Small)"></TelerikLoader>
+			}
+			else if (LogInformativoUpload.Value == false)
+			{
+				<span class="text-danger"><TelerikIcon Icon="x" /></span>
+			}
+			else
+			{
+				<span class="text-success"><TelerikIcon Icon="check" /></span>
+			}
+		</span>
+		<span class="col text-justify pl-0">@LogInformativoUpload.Key</span>
+	</div>
+}
+
+@if (!string.IsNullOrWhiteSpace(LogInformativoProcessamento.Key))
+{
+	<div class="form-inline form-group">
+		<span class="col-auto align-self-start">
+			@if (LogInformativoProcessamento.Value == null)
+			{
+				<TelerikLoader Class="loader-indicator" Type="@LoaderType.ConvergingSpinner" Size="@(ThemeConstants.Loader.Size.Small)"></TelerikLoader>
+			}
+			else if (LogInformativoProcessamento.Value == false)
+			{
+				<span class="text-danger"><TelerikIcon Icon="x" /></span>
+			}
+			else
+			{
+				<span class="text-success"><TelerikIcon Icon="check" /></span>
+			}
+		</span>
+		<span class="col text-justify pl-0">@LogInformativoProcessamento.Key</span>
+	</div>
+}
+
+
+@if (ResultadoProcessamento != null && ResultadoProcessamento.Sucesso)
+{
+	if (ResultadoProcessamento.ListaCPF.Any())
+	{
+		if (ResultadoProcessamento.ListaCPF.Count == 1)
+		{
+			<div class="alert alert-success">
+				<span>Identificamos o CPF no arquivo. Confirme que é o CPF que deseja utilizar para o cadastro.</span>
+			</div>
+		}
+		else
+		{
+			<div class="alert alert-warning mx-3">
+				<span>Identificamos @ResultadoProcessamento.ListaCPF.Count possíveis CPF no arquivo. Selecione o CPF que deseja utilizar para o cadastro.</span>
+			</div>
+		}
+	}
+	else
+	{
+		<div class="alert alert-warning mx-3">
+			<span>Não foi possível identificar o CPF no arquivo selecionado.</span>
+		</div>
+	}
+
+	<div class="form-inline justify-content-center">
+		@foreach (var item in ResultadoProcessamento.ListaCPF)
+		{
+			<div class="form-group col-auto">
+				<TelerikButton ThemeColor="primary" OnClick="@(() => SelecionarCPF(item.Valor))">
+					<span>Continuar com @((item.ValorOriginal))</span>
+				</TelerikButton>
+			</div>
+		}
+	</div>
+}
+

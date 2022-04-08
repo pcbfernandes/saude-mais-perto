@@ -1,0 +1,190 @@
+﻿@inherits ValidarPessoaBase
+@using SMP.Dominio
+
+
+
+<TelerikWindow Width="800px" Height="600px" Visible="@IsVisible" VisibleChanged="@VisibleChangedHandler">
+	<WindowTitle>
+		<strong>Simular Validação</strong>
+	</WindowTitle>
+	<WindowContent>
+
+		<div class="container">
+			<div class="row">
+				<TelerikTabStrip @bind-ActiveTabIndex="@ActiveTabIndex">
+					<TabStripTab Title="Status">
+						@{
+							string css = "info";
+
+							if (ModelResultadoValidacaoPessoa.EstaValido.HasValue)
+							{
+								css = ModelResultadoValidacaoPessoa.EstaValido == true ? "success" : "danger";
+							}
+
+							<div class="text-center">
+								<div class="alert alert-@css">@ModelResultadoValidacaoPessoa.ResultadoValidacao</div>
+							</div>
+
+						}
+
+
+						@if (ModelResultadoValidacaoPessoa.ListaValidacaoPessoa?.Any() == true)
+						{
+							<table class="table">
+								<thead>
+									<tr>
+										<th>Id</th>
+										<th>Data Criação</th>
+										<th>Mensagem</th>
+										<th>Situação</th>
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var item in ModelResultadoValidacaoPessoa.ListaValidacaoPessoa)
+									{
+										<tr>
+											<td>
+												<div>
+													@(ModelResultadoValidacaoPessoa.ListaValidacaoPessoa.IndexOf(item) + 1)
+												</div>
+											</td>
+											<td>
+												<div>
+													@item.DataCriacao.Value.ToString("dd/MM/yyyy HH:mm")
+												</div>
+											</td>
+											<td>
+												<div>
+													@item.Mensagem
+												</div>
+											</td>
+											<td>
+												@if (item.DataVisualizacao.HasValue)
+												{
+													<span class="badge badge-info">@($"Visualizado em {item.DataVisualizacao:dd/MM/yyyy HH:mm}")</span>
+												}
+												else if (item.PessoaValidada)
+												{
+													<span class="badge badge-success">"Cadastro validado"</span>
+												}
+												else
+												{
+													<span class="badge badge-warning">Pendente</span>
+												}
+											</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+						}
+					</TabStripTab>
+					<TabStripTab Title="Validação">
+						<div class="form-group form-inline">
+							<div class="col">
+								<label for="@ModelValidacaoPessoa.PessoaValidada">@(ModelValidacaoPessoa.GetDisplayAttributeFrom("PessoaValidada"))</label>
+							</div>
+							<div class="col text-md-left text-right">
+								<TelerikSwitch @bind-Value="@ModelValidacaoPessoa.PessoaValidada"
+											   Width="70px" Class="switch-custom"
+											   OnLabel="Sim" OffLabel="Não">
+								</TelerikSwitch>
+							</div>
+						</div>
+
+						@if (!ModelValidacaoPessoa.PessoaValidada)
+						{
+							<EditForm Model="@ModelValidacaoPessoa" class="text-center"
+								  OnValidSubmit="@HandleValidSubmit"
+								  OnInvalidSubmit="@HandleInvalidSubmit">
+								<DataAnnotationsValidator />
+								<TelerikValidationSummary Class="text-center" />
+
+								<div class="">
+									<div class="form-group">
+										<div class="form-inline">
+											<div class="col">
+												<div class="k-form-field row">
+													<TelerikFloatingLabel Text="@(ModelValidacaoPessoa.GetDisplayAttributeFrom("Mensagem"))" Class="required-label">
+														<div class="k-form-field-wrap row">
+															<TelerikTextBox @bind-Value="@ModelValidacaoPessoa.Mensagem"></TelerikTextBox>
+														</div>
+													</TelerikFloatingLabel>
+												</div>
+											</div>
+											<div class="col-auto align-self-end">
+												<TelerikButton ButtonType="@ButtonType.Submit"
+														   Class="k-form-submit align-bottom"
+														   ThemeColor="@ThemeConstants.Button.ThemeColor.Primary">Adicionar</TelerikButton>
+											</div>
+										</div>
+									</div>
+
+								</div>
+							</EditForm>
+
+							@if (ListaValidacaoPessoa?.Any() == true)
+							{
+								<table class="table">
+									<thead>
+										<tr>
+											<th>Id</th>
+											<th>Mensagem</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										@foreach (var item in ListaValidacaoPessoa)
+										{
+											<tr>
+												<td>
+													<div>
+														@(ListaValidacaoPessoa.IndexOf(item) + 1)
+													</div>
+												</td>
+												<td>
+													<div>
+														@item.Mensagem
+													</div>
+												</td>
+												<td>
+													<TelerikButton Icon="trash" OnClick="@(()=>Remover_OnClick(item))"></TelerikButton>
+												</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+							}
+
+						}
+						<div class="col-auto text-center">
+							<TelerikButton Icon="save" OnClick="@Salvar">Salvar</TelerikButton>
+						</div>
+					</TabStripTab>
+				</TelerikTabStrip>
+			</div>
+		</div>
+	</WindowContent>
+	<WindowActions>
+		<WindowAction Title="Maximizar" Name="Maximize" />
+		<WindowAction Title="Fechar" Name="Close" />
+	</WindowActions>
+</TelerikWindow>
+
+<style>
+
+	.k-switch-label-on, .k-switch-label-off {
+		display: inline;
+	}
+
+	.k-switch-label-on {
+		left: 7px;
+		color: #ffffff;
+		text-transform: uppercase;
+	}
+
+	.k-switch-label-off {
+		right: 5px;
+		color: #424242;
+		text-transform: uppercase;
+	}
+</style>

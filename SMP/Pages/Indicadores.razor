@@ -1,0 +1,53 @@
+﻿@page "/indicadores"
+@inherits IndicadoresBase
+@attribute [Authorize(Policy = SMP.Dominio.Seguranca.Policies.IsAdmin)]
+
+<div class="row">
+	<div class="container-fluid">
+		<h3>Indicadores</h3>
+		<div class="form-inline row">
+
+			@foreach (var indicador in ListaIndicadores)
+			{
+				<div class="col-md-4 mb-3">
+					<div class="card border-primary w-100 ">
+						<div class="card-header text-primary text-center">@indicador.Key</div>
+						<div class="card-body text-primary text-center">
+							<TelerikChart>
+								<ChartLegend Position="ChartLegendPosition.Bottom"></ChartLegend>
+
+								<ChartSeriesItems>
+									<ChartSeries Type="ChartSeriesType.Pie"
+											 Data="@indicador.Value"
+											 Field="@nameof(ModelData.Total)"
+											 CategoryField="@nameof(ModelData.ValorAtributo)"
+											 ExplodeField="@nameof(ModelData.Explode)">
+										<ChartSeriesTooltip Visible="true" Context="item">
+											<Template>
+												@{
+													var dataItem = item.DataItem as ModelData;
+												}
+
+												<div>
+													<span>@indicador.Key: </span><strong>@dataItem.ValorAtributo</strong>
+												</div>
+												<div>
+													@($"{dataItem.Total} de {indicador.Value.Sum(i=>i.Total)}")
+												</div>
+												@item.Percentage.ToString("P")
+											</Template>
+										</ChartSeriesTooltip>
+										<ChartSeriesLabels Position="ChartSeriesLabelsPosition.OutsideEnd"
+													   Visible="true"></ChartSeriesLabels>
+										<ChartLegend Orientation="ChartLegendOrientation.Vertical" Position="ChartLegendPosition.Bottom"></ChartLegend>
+									</ChartSeries>
+								</ChartSeriesItems>
+							</TelerikChart>
+						</div>
+					</div>
+				</div>
+			}
+
+		</div>
+	</div>
+</div>

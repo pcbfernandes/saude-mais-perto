@@ -1,0 +1,1112 @@
+﻿@page "/Cadastro/{ParametroCPF}"
+@inherits CadastroBase
+@using SMP.Dominio
+@using SMP.Dominio.Controlador
+@using SMP.Dominio.Model
+@using SMP.Shared.Component
+
+<LoaderContainer IsBusy="@IsBusy" Message="@LoaderMessage" IsOnTopScreen=true></LoaderContainer>
+
+@if (ShowWizard)
+{
+	<div class="form-group row">
+		<TelerikNotification @ref="NotificationComponent"
+						 Class="demo-notification"
+						 HorizontalPosition="@NotificationHorizontalPosition.Center"
+						 VerticalPosition="@NotificationVerticalPosition.Bottom"></TelerikNotification>
+
+		<div class="d-lg-none">
+			<TelerikStepper Value="@WizardStep" ValueChanged="@Stepper_OnChange" Linear=true>
+				<StepperSteps>
+					<StepperStep Icon="user"></StepperStep>
+					<StepperStep Icon="globe-outline"></StepperStep>
+					<StepperStep Icon="accessibility"></StepperStep>
+					<StepperStep Icon="myspace"></StepperStep>
+					<StepperStep Icon="check"></StepperStep>
+				</StepperSteps>
+			</TelerikStepper>
+		</div>
+
+		<div class="d-none d-lg-block">
+			<TelerikStepper Value="@WizardStep" ValueChanged="@Stepper_OnChange" Linear=true>
+				<StepperSteps>
+					<StepperStep Label="Dados Cadastrais" Icon="user"></StepperStep>
+					<StepperStep Label="Dados Sociodemográficos" Icon="globe-outline"></StepperStep>
+					<StepperStep Label="Condições de Saúde" Icon="accessibility"></StepperStep>
+					<StepperStep Label="Família" Icon="myspace"></StepperStep>
+					<StepperStep Label="Confirmação" Icon="check"></StepperStep>
+				</StepperSteps>
+			</TelerikStepper>
+		</div>
+		<div class="container">
+			<TelerikWizard @bind-Value="@WizardStep" OnFinish="@OnWizardFinish" ShowPager=false Class="custom-wizard">
+				<WizardSteps>
+					<WizardStep Label="Dados Cadastrais" Icon="user" OnChange="@OnRegistrationStepChange">
+						<Content>
+							<h1 class="text-sm-left text-center">Dados Cadastrais</h1>
+							<TelerikForm Model="@ModelDadosCadastrais" @ref="@RegisterForm">
+								<FormValidation>
+									<DataAnnotationsValidator />
+									<CustomValidation @ref="CustomValidation" />
+								</FormValidation>
+								<FormItems>
+									<TelerikValidationSummary />
+
+									<div class="col-md-12">
+										<div class="col-md">
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("CPF"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<TelerikMaskedTextBox @bind-Value="@ModelDadosCadastrais.CPF" Enabled=false Mask="000.000.000-00" IncludeLiterals=false></TelerikMaskedTextBox>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("Nome"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<TelerikTextBox @bind-Value="@ModelDadosCadastrais.Nome"></TelerikTextBox>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											<div class="k-form-field row align-items-center">
+												<div class="form-inline" style="padding-left: 0px;">
+													<div class="col" style="padding-left: 0px;">
+														<div class="form-inline row">
+
+
+															<label for="@InserirNomeSocial" class="custom-label align-middle">
+																<span id="icoInfoNomeSocial" class="medium-icons align-middle"
+																  title="DECRETO Nº 8.727, 28/04/2016: O nome social é a designação pela qual a pessoa travesti ou transexual se identifica e é socialmente reconhecida">
+																	<TelerikIcon Icon="question-circle" Class="align-middle" />
+																</span>
+																<span>
+																	Informar Nome Social?
+																</span>
+															</label>
+
+
+															<TelerikTooltip TargetSelector="#icoInfoNomeSocial" Position="@TooltipPosition.Top" ShowOn="@TooltipShowEvent.Click"></TelerikTooltip>
+														</div>
+													</div>
+													<div class="col text-md-left text-right">
+														<TelerikSwitch @bind-Value="@InserirNomeSocial"
+																   Width="70px" Class="switch-custom"
+																   OnLabel="Sim" OffLabel="Não">
+														</TelerikSwitch>
+													</div>
+												</div>
+											</div>
+
+											@if (InserirNomeSocial)
+											{
+												<div class="k-form-field row">
+													<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("NomeSocial"))" Class="custom-label">
+														<div class="k-form-field-wrap row">
+															<TelerikTextBox @bind-Value="@ModelDadosCadastrais.NomeSocial"></TelerikTextBox>
+														</div>
+													</TelerikFloatingLabel>
+												</div>
+											}
+
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("Sexo"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<TelerikDropDownList Data="@OpcoesSexo" Width="100%"
+																		 TextField="Key"
+																		 ValueField="Value"
+																		 @bind-Value="@ModelDadosCadastrais.Sexo">
+															<DropDownListSettings>
+																<DropDownListPopupSettings Height="Auto" />
+															</DropDownListSettings>
+														</TelerikDropDownList>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("DataNascimento"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<TelerikDatePicker ValidateOn="@ValidationEvent.Change" Max="@(DateTime.Today.AddDays(-1))" @bind-Value="@ModelDadosCadastrais.DataNascimento">
+															<DatePickerFormatPlaceholder Year="aaaa" Month="mm" Day="dd"></DatePickerFormatPlaceholder>
+														</TelerikDatePicker>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("NomeMae"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<TelerikTextBox @bind-Value="@ModelDadosCadastrais.NomeMae"></TelerikTextBox>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("NomePai"))" Class="custom-label">
+													<div class="k-form-field-wrap row">
+														<TelerikTextBox @bind-Value="@ModelDadosCadastrais.NomePai"></TelerikTextBox>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("TelefoneContato"))" Class="custom-label">
+													<div class="k-form-field-wrap row">
+														<TelerikMaskedTextBox @bind-Value="@ModelDadosCadastrais.TelefoneContato"
+																		  OnBlur="@TelefoneContato_OnBlur" Mask="(00) 00000-0000" MaskOnFocus=true IncludeLiterals=false></TelerikMaskedTextBox>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("CEP"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<div class="form-inline row">
+															<div class="col row">
+																<TelerikMaskedTextBox @bind-Value="@ModelDadosCadastrais.CEP" MaskOnFocus=true Mask="00.000-000" IncludeLiterals=false></TelerikMaskedTextBox>
+															</div>
+															<div class="col-auto row">
+																<TelerikButton OnClick="@(()=>UtilizarCep_OnClink())" Enabled="(!UtilizarCepBuzy)">
+																	<TelerikLoader Class="loader-indicator" ThemeColor="light" Visible="@UtilizarCepBuzy"></TelerikLoader>
+																	@if (UtilizarCepBuzy)
+																	{
+																		<span>Consultando...</span>
+																	}
+																	else
+																	{
+																		<TelerikIcon Icon="search" />
+																		<span>Utilizar CEP</span>
+																	}
+																</TelerikButton>
+															</div>
+														</div>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											@if (!string.IsNullOrWhiteSpace(ModelDadosCadastrais.DescricaoCnesReferencia))
+											{
+												<div class="row">
+													<div class="d-flex p-0">
+														<span class="alert alert-info p-0 mb-0 mt-3">
+															<span>@(ModelDadosCadastrais.GetDisplayAttributeFrom("DescricaoCnesReferencia"))</span>
+															<span>@ModelDadosCadastrais.DescricaoCnesReferencia</span>
+														</span>
+													</div>
+												</div>
+											}
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("CodEstado"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<TelerikDropDownList Data="@OpcoesEstado" Width="100%"
+																		 TextField="Descricao"
+																		 ValueField="CodEstado"
+																		 OnChange="@Estado_OnChage"
+																		 ScrollMode="@DropDownScrollMode.Virtual"
+																		 PageSize="10"
+																		 ItemHeight="35"
+																		 Filterable="true"
+																		 FilterOperator="@StringFilterOperator.StartsWith"
+																		 @bind-Value="@ModelDadosCadastrais.CodEstado">
+															<DropDownListSettings>
+																<DropDownListPopupSettings Height="300px" />
+															</DropDownListSettings>
+														</TelerikDropDownList>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("CodMunicipioIbge"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<TelerikDropDownList Data="@OpcoesMunicipio"
+																		 Width="100%"
+																		 TextField="Nome"
+																		 ValueField="CodigoIBGE"
+																		 ScrollMode="@DropDownScrollMode.Virtual"
+																		 PageSize="10"
+																		 ItemHeight="35"
+																		 Filterable="true"
+																		 FilterOperator="@StringFilterOperator.StartsWith"
+																		 @bind-Value="@ModelDadosCadastrais.CodMunicipioIbge">
+															<DropDownListSettings>
+																<DropDownListPopupSettings Height="300px" />
+															</DropDownListSettings>
+														</TelerikDropDownList>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("Bairro"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<TelerikTextBox @bind-Value="@ModelDadosCadastrais.Bairro"></TelerikTextBox>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("Logradouro"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<TelerikTextBox @bind-Value="@ModelDadosCadastrais.Logradouro"></TelerikTextBox>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("CodRacaCor"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<TelerikDropDownList Data="@OpcoesRacaCor"
+																		 TextField="Key"
+																		 ValueField="Value"
+																		 OnChange="@RacaCor_OnChage"
+																		 @bind-Value="@ModelDadosCadastrais.CodRacaCor">
+															<DropDownListSettings>
+																<DropDownListPopupSettings Height="Auto" />
+															</DropDownListSettings>
+														</TelerikDropDownList>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											@if (ExibirDivEtnia)
+											{
+												<div class="k-form-field row">
+													<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("CodEtnia"))" Class="required-label">
+														<div class="k-form-field-wrap row">
+															<TelerikDropDownList Data="@OpcoesEtnia" Width="100%"
+																		 TextField="Key"
+																		 ValueField="Value"
+																		 ScrollMode="@DropDownScrollMode.Virtual"
+																		 PageSize="10"
+																		 ItemHeight="35"
+																		 Filterable="true"
+																		 FilterOperator="@StringFilterOperator.Contains"
+																		 @bind-Value="@ModelDadosCadastrais.CodEtnia">
+																<DropDownListSettings>
+																	<DropDownListPopupSettings Height="300px" />
+																</DropDownListSettings>
+															</TelerikDropDownList>
+														</div>
+													</TelerikFloatingLabel>
+												</div>
+											}
+
+											<div class="k-form-field row">
+												<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("CodNacionalidade"))" Class="required-label">
+													<div class="k-form-field-wrap row">
+														<TelerikDropDownList Data="@OpcoesNacionalidade"
+																		 TextField="Key"
+																		 ValueField="Value"
+																		 OnChange="@Nacionalidade_OnChage"
+																		 @bind-Value="@ModelDadosCadastrais.CodNacionalidade">
+															<DropDownListSettings>
+																<DropDownListPopupSettings Height="Auto" />
+															</DropDownListSettings>
+														</TelerikDropDownList>
+													</div>
+												</TelerikFloatingLabel>
+											</div>
+
+											@if (ModelDadosCadastrais.CodNacionalidade.HasValue)
+											{
+												@if (ModelDadosCadastrais.CodNacionalidade == ControladorDadosEsus.COD_NACIONALIDADE_BRASILEIRA
+														|| ModelDadosCadastrais.CodNacionalidade == ControladorDadosEsus.COD_NACIONALIDADE_ESTRANGEIRO)
+												{
+													<div class="k-form-field row">
+														<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("CodPaisNascimento"))" Class="required-label">
+															<div class="k-form-field-wrap row">
+																<TelerikDropDownList Data="@OpcoesPaisNascimento" Width="100%"
+																		 TextField="Descricao"
+																		 ValueField="CodPais"
+																		 OnChange="@EstadoNascimento_OnChage"
+																		 ScrollMode="@DropDownScrollMode.Virtual"
+																		 PageSize="10"
+																		 ItemHeight="35"
+																		 Filterable="true"
+																		 FilterOperator="@StringFilterOperator.StartsWith"
+																		 Enabled=@HabilitarSelecaoPaisNascimento
+																		 @bind-Value="@ModelDadosCadastrais.CodPaisNascimento">
+																	<DropDownListSettings>
+																		<DropDownListPopupSettings Height="300px" />
+																	</DropDownListSettings>
+																</TelerikDropDownList>
+															</div>
+														</TelerikFloatingLabel>
+													</div>
+													@if (ModelDadosCadastrais.CodNacionalidade == ControladorDadosEsus.COD_NACIONALIDADE_BRASILEIRA)
+													{
+														<div class="k-form-field row">
+															<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("CodEstadoNascimento"))" Class="required-label">
+																<div class="k-form-field-wrap row">
+																	<TelerikDropDownList Data="@OpcoesEstadoNascimento" Width="100%"
+																		 TextField="Descricao"
+																		 ValueField="CodEstado"
+																		 OnChange="@EstadoNascimento_OnChage"
+																		 ScrollMode="@DropDownScrollMode.Virtual"
+																		 PageSize="10"
+																		 ItemHeight="35"
+																		 Filterable="true"
+																		 FilterOperator="@StringFilterOperator.Contains"
+																		 @bind-Value="@ModelDadosCadastrais.CodEstadoNascimento">
+																		<DropDownListSettings>
+																			<DropDownListPopupSettings Height="300px" />
+																		</DropDownListSettings>
+																	</TelerikDropDownList>
+																</div>
+															</TelerikFloatingLabel>
+														</div>
+
+														<div class="k-form-field row">
+															<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("CodIbgeMunicipioNascimento"))" Class="required-label">
+																<div class="k-form-field-wrap row">
+																	<TelerikDropDownList Data="@OpcoesMunicipioNascimento"
+																		 Width="100%"
+																		 TextField="Nome"
+																		 ValueField="CodigoIBGE"
+																		 ScrollMode="@DropDownScrollMode.Virtual"
+																		 PageSize="10"
+																		 ItemHeight="35"
+																		 Filterable="true"
+																		 FilterOperator="@StringFilterOperator.StartsWith"
+																		 @bind-Value="@ModelDadosCadastrais.CodIbgeMunicipioNascimento">
+																		<DropDownListSettings>
+																			<DropDownListPopupSettings Height="300px" />
+																		</DropDownListSettings>
+																	</TelerikDropDownList>
+																</div>
+															</TelerikFloatingLabel>
+														</div>
+													}
+													else
+													{
+														<div class="k-form-field row">
+															<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("DataEtradaBrasil"))" Class="required-label">
+																<div class="k-form-field-wrap row">
+																	<TelerikDatePicker ValidateOn="@ValidationEvent.Change" @bind-Value="@ModelDadosCadastrais.DataEtradaBrasil">
+																		<DatePickerFormatPlaceholder Year="aaaa" Month="mm" Day="dd"></DatePickerFormatPlaceholder>
+																	</TelerikDatePicker>
+																</div>
+															</TelerikFloatingLabel>
+														</div>
+													}
+												}
+												else
+												{
+													<div class="k-form-field row">
+														<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("DataNaturalizacao"))" Class="required-label">
+															<div class="k-form-field-wrap row">
+																<TelerikDatePicker ValidateOn="@ValidationEvent.Change" @bind-Value="@ModelDadosCadastrais.DataNaturalizacao">
+																	<DatePickerFormatPlaceholder Year="aaaa" Month="mm" Day="dd"></DatePickerFormatPlaceholder>
+																</TelerikDatePicker>
+															</div>
+														</TelerikFloatingLabel>
+													</div>
+
+													<div class="k-form-field row">
+														<TelerikFloatingLabel Text="@(ModelDadosCadastrais.GetDisplayAttributeFrom("PortariaNaturalizacao"))" Class="required-label">
+															<div class="k-form-field-wrap row">
+																<TelerikTextBox @bind-Value="@ModelDadosCadastrais.PortariaNaturalizacao"></TelerikTextBox>
+															</div>
+														</TelerikFloatingLabel>
+													</div>
+												}
+											}
+
+
+
+										</div>
+									</div>
+								</FormItems>
+								<FormButtons></FormButtons>
+							</TelerikForm>
+						</Content>
+					</WizardStep>
+					<WizardStep Label="Dados Sociodemográficos" Icon="globe-outline" OnChange="@OnRegistrationStepChange">
+						<Content>
+							<h3 class="text-sm-left text-center">Dados Sociodemográficos</h3>
+							<TelerikForm Model="@ModelDadosSocioDemograficos" @ref="@RegisterForm">
+								<FormValidation>
+									<DataAnnotationsValidator />
+									<CustomValidation @ref="CustomValidation" />
+								</FormValidation>
+								<FormItems>
+									<TelerikValidationSummary />
+
+									<div class="">
+										<div class="">
+
+											<div class="form-group form-inline">
+												<div class="col-md">
+													<label for="@ModelDadosSocioDemograficos.CBO">@(ModelDadosSocioDemograficos.GetDisplayAttributeFrom("CBO"))</label>
+												</div>
+												<div class="col-md">
+													<TelerikDropDownList Data="@OpcoesOcupacao" Width="100%"
+																	 TextField="DescricaoCBO"
+																	 ValueField="CBO"
+																	 ScrollMode="@DropDownScrollMode.Virtual"
+																	 PageSize="10"
+																	 ItemHeight="35"
+																	 Filterable="true"
+																	 FilterOperator="@StringFilterOperator.Contains"
+																	 @bind-Value="@ModelDadosSocioDemograficos.CBO">
+														<DropDownListSettings>
+															<DropDownListPopupSettings Height="300px" />
+														</DropDownListSettings>
+													</TelerikDropDownList>
+												</div>
+											</div>
+
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosSocioDemograficos.FrequentaEscolaCreche">@(ModelDadosSocioDemograficos.GetDisplayAttributeFrom("FrequentaEscolaCreche"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosSocioDemograficos.FrequentaEscolaCreche"
+															   Width="70px" Class="switch-custom"
+															   Enabled=@(ModelDadosCadastrais.Idade <= IdadeCorte )
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col-md">
+													<label for="@ModelDadosSocioDemograficos.CodGrauInstrucao">@(ModelDadosSocioDemograficos.GetDisplayAttributeFrom("CodGrauInstrucao"))</label>
+												</div>
+												<div class="col-md">
+													<TelerikDropDownList Data="@OpcoesGrauInstrucao" Width="100%"
+																	 TextField="Key"
+																	 ValueField="Value"
+																	 @bind-Value="@ModelDadosSocioDemograficos.CodGrauInstrucao">
+														<DropDownListSettings>
+															<DropDownListPopupSettings Height="Auto" />
+														</DropDownListSettings>
+													</TelerikDropDownList>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col-md">
+													<label for="@ModelDadosSocioDemograficos.CodSituacaoMercado">@(ModelDadosSocioDemograficos.GetDisplayAttributeFrom("CodSituacaoMercado"))</label>
+												</div>
+												<div class="col-md">
+													<TelerikDropDownList Data="@OpcoesSituacaoMercado" Width="100%"
+																	 TextField="Key"
+																	 ValueField="Value"
+																	 @bind-Value="@ModelDadosSocioDemograficos.CodSituacaoMercado">
+														<DropDownListSettings>
+															<DropDownListPopupSettings Height="Auto" />
+														</DropDownListSettings>
+													</TelerikDropDownList>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col-md">
+													<label for="@ModelDadosSocioDemograficos.CodResponsavelPorCrianca">@(ModelDadosSocioDemograficos.GetDisplayAttributeFrom("CodResponsavelPorCrianca"))</label>
+												</div>
+												<div class="col-md">
+													<TelerikDropDownList Data="@OpcoesResponsavelPorCrianca" Width="100%"
+																	 TextField="Key"
+																	 ValueField="Value"
+																	 @bind-Value="@ModelDadosSocioDemograficos.CodResponsavelPorCrianca">
+														<DropDownListSettings>
+															<DropDownListPopupSettings Height="Auto" />
+														</DropDownListSettings>
+													</TelerikDropDownList>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosSocioDemograficos.PossuiPlanoSaudePrivado">@(ModelDadosSocioDemograficos.GetDisplayAttributeFrom("PossuiPlanoSaudePrivado"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosSocioDemograficos.PossuiPlanoSaudePrivado"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+										</div>
+									</div>
+								</FormItems>
+								<FormButtons></FormButtons>
+							</TelerikForm>
+						</Content>
+					</WizardStep>
+					<WizardStep Label="Condições de Saúde" Icon="accessibility" OnChange="@OnRegistrationStepChange">
+						<Content>
+							<h1 class="text-sm-left text-center">Condições de Saúde</h1>
+							<TelerikForm Model="@ModelDadosCondicoesSaude" @ref="@RegisterForm">
+								<FormValidation>
+									<DataAnnotationsValidator />
+									<CustomValidation @ref="CustomValidation" />
+								</FormValidation>
+								<FormItems>
+									<TelerikValidationSummary />
+
+									<div class="">
+										<div class="">
+
+											@if (ModelDadosCadastrais.Sexo == ControladorDadosEsus.COD_SEXO_FEMININO)
+											{
+												<div class="form-group form-inline">
+													<div class="col">
+														<label for="@ModelDadosCondicoesSaude.Gestante">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("Gestante"))</label>
+													</div>
+													<div class="col">
+														<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.Gestante"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+														</TelerikSwitch>
+													</div>
+												</div>
+											}
+
+											<div class="form-group form-inline">
+												<div class="col-md">
+													<label for="@ModelDadosCondicoesSaude.CodConsideracaoPeso">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("CodConsideracaoPeso"))</label>
+												</div>
+												<div class="col-md">
+													<TelerikDropDownList Data="@OpcoesConsideracaoPeso" Width="100%"
+																	 TextField="Key"
+																	 ValueField="Value"
+																	 @bind-Value="@ModelDadosCondicoesSaude.CodConsideracaoPeso">
+														<DropDownListSettings>
+															<DropDownListPopupSettings Height="Auto" />
+														</DropDownListSettings>
+													</TelerikDropDownList>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.Fumante">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("Fumante"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.Fumante"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.FazUsoAlcool">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("FazUsoAlcool"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.FazUsoAlcool"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.FazUsoOutrasDrogas">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("FazUsoOutrasDrogas"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.FazUsoOutrasDrogas"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.TemHipertensaoArterial">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("TemHipertensaoArterial"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.TemHipertensaoArterial"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.TemDiabetes">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("TemDiabetes"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.TemDiabetes"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.TeveAvcDerrame">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("TeveAvcDerrame"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.TeveAvcDerrame"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.TeveInfarto">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("TeveInfarto"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.TeveInfarto"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.TeveDoencaCardiaca">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("TeveDoencaCardiaca"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.TeveDoencaCardiaca"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.TemDoencaRespiratoria">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("TemDoencaRespiratoria"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.TemDoencaRespiratoria"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.TemHanseniase">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("TemHanseniase"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.TemHanseniase"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.TemTuberculose">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("TemTuberculose"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.TemTuberculose"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.TemTeveCancer">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("TemTeveCancer"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.TemTeveCancer"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.DiagnosticoMental">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("DiagnosticoMental"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.DiagnosticoMental"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.Acamado">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("Acamado"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.Acamado"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.TeveCOVID19">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("TeveCOVID19"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.TeveCOVID19"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col-md">
+													<label for="@ModelDadosCondicoesSaude.SituacaoVacinalCOVID19">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("SituacaoVacinalCOVID19"))</label>
+												</div>
+												<div class="col-md">
+													<TelerikDropDownList Data="@OpcoesSituacaoVacinalCOVID19" Width="100%"
+																	 TextField="Key"
+																	 ValueField="Value"
+																	 @bind-Value="@ModelDadosCondicoesSaude.SituacaoVacinalCOVID19">
+														<DropDownListSettings>
+															<DropDownListPopupSettings Height="Auto" />
+														</DropDownListSettings>
+													</TelerikDropDownList>
+												</div>
+											</div>
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.PossuiOutraCondicaoSaude">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("PossuiOutraCondicaoSaude"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.PossuiOutraCondicaoSaude"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											@if (ModelDadosCondicoesSaude.PossuiOutraCondicaoSaude)
+											{
+												<div class="form-group form-inline col-md-12">
+													<div class="k-form-field w-100">
+														<TelerikFloatingLabel Text="@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("QualOutraCondicaoSaude"))" Class="required-label">
+															<div class="k-form-field-wrap">
+																<TelerikTextBox @bind-Value="@ModelDadosCondicoesSaude.QualOutraCondicaoSaude"></TelerikTextBox>
+															</div>
+														</TelerikFloatingLabel>
+													</div>
+												</div>
+											}
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.EmSituacaoDeRua">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("EmSituacaoDeRua"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.EmSituacaoDeRua"
+															   Width="70px" Class="switch-custom"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+
+											<div class="form-group form-inline">
+												<div class="col">
+													<label for="@ModelDadosCondicoesSaude.PossuiDeficiencia">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("PossuiDeficiencia"))</label>
+												</div>
+												<div class="col text-md-left text-right">
+													<TelerikSwitch @bind-Value="@ModelDadosCondicoesSaude.PossuiDeficiencia"
+															   Width="70px" Class="switch-custom"
+															   OnChange="@PossuiDeficiencia_OnChange"
+															   OnLabel="Sim" OffLabel="Não">
+													</TelerikSwitch>
+												</div>
+											</div>
+
+											@if (ExibirDivQualDeficiencia)
+											{
+												<div class="">
+													<div class="col-md-12 form-group ">
+														<div class="form-inline row">
+															<div class="col">
+																<label for="@ModelDadosCondicoesSaude.QualDeficiencia">@(ModelDadosCondicoesSaude.GetDisplayAttributeFrom("QualDeficiencia"))</label>
+															</div>
+															<div class="col text-md-left text-right">
+																<div class="">
+																	@{
+																		foreach (var item in OpcoesDeficiencias)
+																		{
+																			<div class="form-inline">
+																				<TelerikCheckBox Id="@($"checkBox_{item.Codigo}")" @bind-Value="@item.IsSelecionado" OnChange="@QualDeficiencia_OnChange" />
+																				<label for="@($"checkBox_{item.Codigo}")">@item.Descricao</label>
+																			</div>
+																		}
+																	}
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											}
+
+										</div>
+									</div>
+								</FormItems>
+								<FormButtons></FormButtons>
+							</TelerikForm>
+						</Content>
+					</WizardStep>
+					<WizardStep Label="Condições de Saúde" Icon="myspace" OnChange="@OnRegistrationStepChange">
+						<Content>
+							<h1 class="text-sm-left text-center">Família</h1>
+							<TelerikForm Model="@ModelDadosFamilia" @ref="@RegisterForm">
+								<FormValidation>
+									<DataAnnotationsValidator />
+									<CustomValidation @ref="CustomValidation" />
+								</FormValidation>
+								<FormItems>
+									<TelerikValidationSummary />
+
+									<div class="">
+										<div class="">
+
+											<div class="form-group">
+												<div class="col-md">
+													<div class="">
+														<br />
+														<div class="form-inline">
+															<div class="col pl-md-0">
+																<div class="">
+																	<label for="@ModelDadosFamilia.ResponsavelFamilia" class="custom-label align-middle">
+																		<span>
+																			@(ModelDadosFamilia.GetDisplayAttributeFrom("ResponsavelFamilia"))
+																		</span>
+																	</label>
+																</div>
+															</div>
+															<div class="col text-md-left text-right">
+																<TelerikSwitch @bind-Value="@ModelDadosFamilia.ResponsavelFamilia"
+																		   Width="70px" Class="switch-custom"
+																		   OnChange="@ResponsavelFamilia_OnChange"
+																		   OnLabel="Sim" OffLabel="Não">
+																</TelerikSwitch>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											@if (ModelDadosFamilia.ResponsavelFamilia != true)
+											{
+												<div class="form-group form-inline">
+													<div class="col-md">
+														<label class="custom-label align-middle" for="@ModelDadosFamilia.CodRelacaoParentescoResponsavel">
+															<span>
+																@(ModelDadosFamilia.GetDisplayAttributeFrom("CodRelacaoParentescoResponsavel"))
+															</span>
+														</label>
+													</div>
+													<div class="col-md pl-md-0">
+														<TelerikDropDownList Data="@OpcoesRelacaoParentesco" Width="100%"
+																	 TextField="Key"
+																	 ValueField="Value"
+																	 @bind-Value="@ModelDadosFamilia.CodRelacaoParentescoResponsavel">
+															<DropDownListSettings>
+																<DropDownListPopupSettings Height="Auto" />
+															</DropDownListSettings>
+														</TelerikDropDownList>
+													</div>
+												</div>
+
+												<div class="form-group">
+													<div class="col-md">
+														<div class="">
+															<div class="form-inline">
+																<div class="col pl-md-0">
+																	<div class="">
+																		<label for="@ModelDadosFamilia.DesejaInformarResponsavelFamilia" class="custom-label align-middle">
+																			<span>
+																				@(ModelDadosFamilia.GetDisplayAttributeFrom("DesejaInformarResponsavelFamilia"))
+																			</span>
+																		</label>
+																	</div>
+																</div>
+																<div class="col text-md-left text-right">
+																	<TelerikSwitch @bind-Value="@ModelDadosFamilia.DesejaInformarResponsavelFamilia"
+																		   Width="70px" Class="switch-custom"
+																		   OnChange="@DesejaInformarResponsavelFamilia_OnChange"
+																		   OnLabel="Sim" OffLabel="Não">
+																	</TelerikSwitch>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												@if (ModelDadosFamilia.DesejaInformarResponsavelFamilia)
+												{
+													<div class="col-md-12">
+														<div class="col-md form-group">
+															<div class="k-form-field row">
+																<TelerikFloatingLabel Text="@(ModelDadosFamilia.GetDisplayAttributeFrom("CpfResponsavel"))" Class="custom-label">
+																	<div class="k-form-field-wrap row">
+																		<TelerikMaskedTextBox @bind-Value="@ModelDadosFamilia.CpfResponsavel"
+																				  MaskOnFocus=true Mask="000.000.000-00"
+																				  IncludeLiterals=false></TelerikMaskedTextBox>
+																	</div>
+																</TelerikFloatingLabel>
+															</div>
+														</div>
+													</div>
+
+
+												}
+											}
+
+											<RelacaoPessoaComponent ParametroIsResponsavel="@ModelDadosFamilia.ResponsavelFamilia"
+																ParametroDesejaInformarResponsavelFamilia="@ModelDadosFamilia.DesejaInformarResponsavelFamilia"
+																ParametroCpf="@ModelDadosCadastrais.CPF"
+																ParametroCodRelacaoParentescoResponsavel="@ModelDadosFamilia.CodRelacaoParentescoResponsavel"
+																ParametroCpfResponsavel="@ModelDadosFamilia.CpfResponsavel"></RelacaoPessoaComponent>
+										</div>
+									</div>
+								</FormItems>
+								<FormButtons></FormButtons>
+							</TelerikForm>
+						</Content>
+					</WizardStep>
+					<WizardStep Label="Confirmação" Icon="check">
+						<Content>
+							<h1 class="text-sm-left text-center">Confirmação</h1>
+							<div class="alert alert-primary text-center" role="alert">
+								Confira os dados antes de concluir
+							</div>
+
+							<ResumoPessoaComponent ParametroCPF="@ParametroCPF" />
+						</Content>
+					</WizardStep>
+				</WizardSteps>
+				<WizardButtons>
+					@{
+						var currentStepIndex = context;
+
+						if (currentStepIndex > 0)
+						{
+							<TelerikButton OnClick="@( () => PreviousClick(currentStepIndex) )">Voltar</TelerikButton>
+						}
+						if (currentStepIndex < 4)
+						{
+							<TelerikButton ThemeColor="primary" OnClick="@( () => NextClick(currentStepIndex) )">Avançar</TelerikButton>
+						}
+						else
+						{
+							<TelerikButton ThemeColor="primary" OnClick="@OnWizardFinish">Concluir</TelerikButton>
+						}
+					}
+				</WizardButtons>
+			</TelerikWizard>
+		</div>
+	</div>
+}
+else
+{
+	<div class="container">
+		<div class="text-center">
+			<div class="alert alert-success text-center" role="alert">
+				Os dados foram salvos com sucesso!
+			</div>
+
+			<a href="/TipoCadastro" role="button" class="btn btn-primary">Inserir novo Cadastro</a>
+		</div>
+	</div>
+}
+
+<style>
+	.required-label {
+		color: grey;
+	}
+
+		.required-label.k-floating-label-container.k-state-focused {
+			color: blue;
+		}
+
+		.required-label.k-floating-label-container.k-state-empty > .k-label {
+			color: red;
+		}
+
+	.custom-label {
+		color: grey;
+	}
+
+		.custom-label.k-floating-label-container.k-state-focused {
+			color: blue;
+		}
+
+		.custom-label.k-floating-label-container.k-state-empty > .k-label {
+			color: grey;
+		}
+
+	.custom-button {
+		width: 100px;
+	}
+
+	.custom-wizard .k-step-list {
+		display: none;
+	}
+
+	.custom-wizard .k-stepper .telerik-blazor {
+		display: none;
+	}
+
+	.custom-wizard .k-wizard-steps {
+		margin-top: 0px;
+	}
+
+	.custom-wizard .k-wizard-step {
+		margin-top: 0px;
+	}
+
+	.custom-wizard {
+		padding-top: 0px;
+	}
+
+	.form-inline label {
+		justify-content: left;
+	}
+
+	.k-switch-label-on, .k-switch-label-off {
+		display: inline;
+	}
+
+	.k-switch-label-on {
+		left: 7px;
+		color: #ffffff;
+		text-transform: uppercase;
+	}
+
+	.k-switch-label-off {
+		right: 5px;
+		color: #424242;
+		text-transform: uppercase;
+	}
+
+	.medium-icons .k-icon {
+		font-size: 20px;
+		display: table-cell;
+	}
+
+	.limited-height {
+		max-height: 100px;
+	}
+</style>
