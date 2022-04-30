@@ -71,6 +71,11 @@
 												{
 													<span class="badge badge-warning">Pendente</span>
 												}
+
+												@if (item.DataExclusao.HasValue)
+												{
+													<span class="badge badge-secondary" title="@($"{item.DataExclusao:dd/MM/yyyy HH:mm}")">Excluído</span>
+												}
 											</td>
 										</tr>
 									}

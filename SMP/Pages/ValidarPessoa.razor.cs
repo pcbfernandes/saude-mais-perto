@@ -33,11 +33,16 @@ namespace SMP.Pages
 			ControladorValidacaoPessoa controladorValidacaoPessoa = new ControladorValidacaoPessoa();
 			ModelResultadoValidacaoPessoa = controladorValidacaoPessoa.ObterResultadoValidacaoPessoa(ParametroCPF, true);
 
-			ListaValidacaoPessoa = ModelResultadoValidacaoPessoa.ListaValidacaoPessoa?.Where(v => !v.DataVisualizacao.HasValue)?.ToList() ?? new List<ValidacaoPessoaModel>();
+			ListaValidacaoPessoa = new List<ValidacaoPessoaModel>();
+			var listaValidacaoPessoa = ModelResultadoValidacaoPessoa.ListaValidacaoPessoa?.Where(v => !v.DataVisualizacao.HasValue && !v.DataExclusao.HasValue)?.ToList() ?? new List<ValidacaoPessoaModel>();
 
 			if (ModelResultadoValidacaoPessoa.EstaValido == true)
 			{
-				ModelValidacaoPessoa = ListaValidacaoPessoa.First();
+				ModelValidacaoPessoa = listaValidacaoPessoa.First();
+			}
+			else
+			{
+				ListaValidacaoPessoa = listaValidacaoPessoa;
 			}
 			ActiveTabIndex = 0;
 		}
@@ -46,7 +51,12 @@ namespace SMP.Pages
 
 		public async void HandleValidSubmit()
 		{
-			ListaValidacaoPessoa.Add(ModelValidacaoPessoa);
+			ListaValidacaoPessoa.Add(new ValidacaoPessoaModel()
+			{
+				CPF = ModelValidacaoPessoa.CPF,
+				Mensagem = ModelValidacaoPessoa.Mensagem,
+			});
+
 			ModelValidacaoPessoa = new ValidacaoPessoaModel() { CPF = ParametroCPF };
 
 			StateHasChanged();
@@ -65,13 +75,11 @@ namespace SMP.Pages
 		{
 			ControladorValidacaoPessoa controladorValidacaoPessoa = new ControladorValidacaoPessoa();
 
-			if (!ListaValidacaoPessoa.Any())
+			if (ModelValidacaoPessoa.PessoaValidada)
 			{
-				if (ModelValidacaoPessoa.PessoaValidada)
-				{					
-					ListaValidacaoPessoa.Add(ModelValidacaoPessoa);
-				}
+				ListaValidacaoPessoa = new List<ValidacaoPessoaModel>() { ModelValidacaoPessoa };
 			}
+
 			controladorValidacaoPessoa.SalvarValidacao(ParametroCPF, ListaValidacaoPessoa);
 			AtualizarDados();
 		}
@@ -82,7 +90,7 @@ namespace SMP.Pages
 			if (!IsVisible)
 			{
 				ParametroCPF = string.Empty;
-				if(OnClose != null)
+				if (OnClose != null)
 				{
 					OnClose(this, EventArgs.Empty);
 				}

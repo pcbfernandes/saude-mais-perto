@@ -44,14 +44,13 @@
 					<WizardStep Label="Dados Cadastrais" Icon="user" OnChange="@OnRegistrationStepChange">
 						<Content>
 							<h1 class="text-sm-left text-center">Dados Cadastrais</h1>
-							<TelerikForm Model="@ModelDadosCadastrais" @ref="@RegisterForm">
+							<TelerikForm Model="@ModelDadosCadastrais" @ref="@RegisterForm" ValidationMessageType="@FormValidationMessageType.Inline">
 								<FormValidation>
 									<DataAnnotationsValidator />
 									<CustomValidation @ref="CustomValidation" />
+									<ValidationSummaryComponent />
 								</FormValidation>
 								<FormItems>
-									<TelerikValidationSummary />
-
 									<div class="col-md-12">
 										<div class="col-md">
 
@@ -434,10 +433,9 @@
 								<FormValidation>
 									<DataAnnotationsValidator />
 									<CustomValidation @ref="CustomValidation" />
+									<ValidationSummaryComponent />
 								</FormValidation>
 								<FormItems>
-									<TelerikValidationSummary />
-
 									<div class="">
 										<div class="">
 
@@ -454,6 +452,7 @@
 																	 ItemHeight="35"
 																	 Filterable="true"
 																	 FilterOperator="@StringFilterOperator.Contains"
+																	 OnRead="@OpcoesOcupacaoReadItems"
 																	 @bind-Value="@ModelDadosSocioDemograficos.CBO">
 														<DropDownListSettings>
 															<DropDownListPopupSettings Height="300px" />
@@ -549,9 +548,9 @@
 								<FormValidation>
 									<DataAnnotationsValidator />
 									<CustomValidation @ref="CustomValidation" />
+									<ValidationSummaryComponent />
 								</FormValidation>
 								<FormItems>
-									<TelerikValidationSummary />
 
 									<div class="">
 										<div class="">
@@ -874,9 +873,9 @@
 								<FormValidation>
 									<DataAnnotationsValidator />
 									<CustomValidation @ref="CustomValidation" />
+									<ValidationSummaryComponent />
 								</FormValidation>
 								<FormItems>
-									<TelerikValidationSummary />
 
 									<div class="">
 										<div class="">

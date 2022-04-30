@@ -4,6 +4,7 @@ using SMP.Dominio.Controlador;
 using SMP.Dominio.Model;
 using SMP.Shared.Component;
 using Telerik.Blazor.Components;
+using Telerik.DataSource.Extensions;
 
 namespace SMP.Pages
 {
@@ -114,6 +115,11 @@ namespace SMP.Pages
 				ModelDadosSocioDemograficos = Utilitarios.ConverterPara<DadosSocioDemograficosModel>(ModelPessoa);
 				ModelDadosCondicoesSaude = Utilitarios.ConverterPara<DadosCondicoesSaudeModel>(ModelPessoa);
 				ModelDadosFamilia = Utilitarios.ConverterPara<DadosFamiliaModel>(ModelPessoa);
+
+				if (!ModelDadosFamilia.ResponsavelFamilia)
+				{
+					ModelDadosFamilia.DesejaInformarResponsavelFamilia = true;
+				}
 
 				InserirNomeSocial = !string.IsNullOrWhiteSpace(ModelDadosCadastrais.NomeSocial);
 
@@ -548,6 +554,28 @@ namespace SMP.Pages
 			}
 
 			StateHasChanged();
+		}
+
+		public async Task OpcoesOcupacaoReadItems(DropDownListReadEventArgs args)
+		{
+			if (args.Request.Filters.Count > 0)
+			{
+				Telerik.DataSource.FilterDescriptor filter = args.Request.Filters[0] as Telerik.DataSource.FilterDescriptor;
+				string userInput = filter.Value.ToString();
+				string method = filter.Operator.ToString();
+
+				args.Data = OpcoesOcupacao.Where(o => RemoveDiacritics(o.DescricaoCBO).ToUpper().Contains(RemoveDiacritics(userInput).ToUpper()));
+			}
+			else
+			{
+				var datasourceResult = OpcoesOcupacao.ToDataSourceResult(args.Request);
+				args.Data = (datasourceResult.Data as IEnumerable<OcupacaoModel>).ToList();
+			}
+		}
+
+		private string RemoveDiacritics(string s)
+		{
+			return Utilitarios.RemoveDiacritics(s);
 		}
 	}
 }

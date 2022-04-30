@@ -8,14 +8,20 @@ namespace SMP.Dominio.Controlador
 	{
 		public void SalvarValidacao(string cpf, List<ValidacaoPessoaModel> validacoes)
 		{
-			List<ValidacaoPessoaModel> existente = _context.DbValidacaoPessoa.Find(v => v.CPF == cpf && !v.DataVisualizacao.HasValue).ToList();
+			List<ValidacaoPessoaModel> existente = _context.DbValidacaoPessoa.Find(v => v.CPF == cpf && !v.DataVisualizacao.HasValue && !v.DataExclusao.HasValue).ToList();
 
 			List<ValidacaoPessoaModel> excluir = existente.Where(e => !validacoes.Any(v => v.Id == e.Id)).ToList();
 			List<ValidacaoPessoaModel> adicionar = validacoes.Where(v => !existente.Any(e => e.Id == v.Id)).ToList();
 
-			foreach (var item in excluir)
+			if (excluir?.Any() == true)
 			{
-				_context.DbValidacaoPessoa.Delete(item.Id);
+				foreach (var item in excluir)
+				{
+					item.DataExclusao = DateTime.Now;
+					//_context.DbValidacaoPessoa.Delete(item.Id);
+				}
+
+				_context.DbValidacaoPessoa.Update(excluir);
 			}
 
 			foreach (var item in adicionar)
@@ -28,7 +34,7 @@ namespace SMP.Dominio.Controlador
 
 		public void AtualizarValidacaoPessoa(string cpf)
 		{
-			var itensPendentes = _context.DbValidacaoPessoa.Find(v => v.CPF == cpf && !v.PessoaValidada && !v.DataVisualizacao.HasValue);
+			var itensPendentes = _context.DbValidacaoPessoa.Find(v => v.CPF == cpf && !v.PessoaValidada && !v.DataVisualizacao.HasValue && !v.DataExclusao.HasValue);
 
 			if (itensPendentes?.Any() == true)
 			{
@@ -127,7 +133,7 @@ namespace SMP.Dominio.Controlador
 			{
 				if (!considerarExcluidos)
 				{
-					retorno.ListaValidacaoPessoa.RemoveAll(v => v.DataVisualizacao.HasValue);
+					retorno.ListaValidacaoPessoa.RemoveAll(v => v.DataVisualizacao.HasValue || v.DataExclusao.HasValue);
 				}
 			}
 

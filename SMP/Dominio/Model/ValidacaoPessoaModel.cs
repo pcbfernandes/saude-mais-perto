@@ -23,5 +23,6 @@ namespace SMP.Dominio.Model
 		public string? Mensagem { get; set; }
 		public DateTime? DataCriacao { get; set; }
 		public DateTime? DataVisualizacao { get; set; }
+		public DateTime? DataExclusao { get; set; }
 	}
 }
