@@ -10,6 +10,6 @@ Uma solução de automação do cadastro individual para equipes de Atenção Pr
 # Laboratório de Inovação
 ![Labiaps](docs/labiaps.PNG) 
 
-Monique           |  Maíra |  Sheila |  Regina |  Paulo
-:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
- ![Monique](docs/monique.png) | ![Maira](docs/maira.png)|![Sheila](docs/sheila.png)|![Regina](docs/regina.png)|![Paulo](docs/paulo.png)
+Monique           | Sheila |  Paulo
+:-------------------------:|:-------------------------:|:-------------------------:
+ ![Monique](docs/monique.png) | ![Sheila](docs/sheila.png)|![Paulo](docs/paulo.png)
